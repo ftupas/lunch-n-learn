@@ -1,0 +1,4 @@
+# Airflow and Python
+logs
+.env
+__pycache__
