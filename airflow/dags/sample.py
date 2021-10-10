@@ -62,33 +62,20 @@ with DAG(
     dag.doc_md = """
     This is a sample DAG meant for demo purposes. 
     """  
-
-    # t1, t2 and t3 are examples of tasks created by instantiating operators
     start = DummyOperator(
         task_id='start'
-    )
-
-    start.doc_md = dedent(
-        """\
-    #### Task Documentation
-    You can document your task using the attributes `doc_md` (markdown),
-    `doc` (plain text), `doc_rst`, `doc_json`, `doc_yaml` which gets
-    rendered in the UI's Task Instance Details page.
-    ![img](http://montcs.bloomu.edu/~bobmon/Semesters/2012-01/491/import%20soul.png)
-
-    """
     )
 
     fetchData = PythonOperator  (
         task_id='fetch_data',
         python_callable=fetch_data,
-        op_kwargs={'url': 'https://raw.githubusercontent.com/vincevertulfo/sample-datasets/main/covid.csv', 'output_filepath': '/opt/airflow/dags/data/raw'}
+        op_kwargs={'url': 'https://raw.githubusercontent.com/vincevertulfo/sample-datasets/main/covid.csv', 'output_filepath': '/opt/airflow/data/raw'}
     )
 
     processData = PythonOperator(
         task_id='process_data',
         python_callable=process_data,
-        op_kwargs={'input_filepath': '/opt/airflow/dags/data/raw', 'output_filepath': '/opt/airflow/dags/data/cleaned'}
+        op_kwargs={'input_filepath': '/opt/airflow/data/raw', 'output_filepath': '/opt/airflow/data/cleaned'}
     )
 
     loadData = PostgresOperator(
@@ -96,7 +83,7 @@ with DAG(
         postgres_conn_id="postgres_default",
         sql="""
             COPY covid
-            FROM '/var/lib/postgresql/files/data/cleaned/{{ params.file_name }}'
+            FROM '/var/lib/postgresql/files/cleaned/{{ params.file_name }}'
             DELIMITER ','
             CSV HEADER;
             """,

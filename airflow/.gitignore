@@ -2,3 +2,5 @@
 logs
 .env
 __pycache__
+postgres-data/
+covid.csv
