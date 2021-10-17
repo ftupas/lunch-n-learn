@@ -23,14 +23,14 @@ https://airflow.apache.org/docs/apache-airflow/stable/start/docker.html#initiali
 
 Airflow is a platform created by the community to programmatically **author**, **schedule** and **monitor** workflows. It was open-sourced by the data team of Airbnb.
 
-![airflow_vs_cron](./images/airflow_features.png)
+![airflow_vs_cron](./images/airflow_features.PNG)
 
 (image from Airflow's website)
 
 <hr>
 
 ## Airflow vs CRON
-![airflow_vs_cron](./images/airflow_vs_cron.png)
+![airflow_vs_cron](./images/airflow_vs_cron.PNG)
 
 <hr>
 
@@ -43,14 +43,14 @@ Airflow is a platform created by the community to programmatically **author**, *
 
 
 ### DAG
-![airflow_vs_cron](./images/dag.png)
+![airflow_vs_cron](./images/dag.PNG)
 
 ### Task
 A Task is the basic unit of execution in Airflow. Tasks are arranged into DAGs, and then have upstream and downstream dependencies set between them into order to express the order they should run in.
 
 ### Operators
 An operator represents a single, ideally idempotent, task. Operators determine what actually executes when your DAG runs.
-![airflow_vs_cron](./images/operator.png)
+![airflow_vs_cron](./images/operator.PNG)
 
 ### DagRun
 A DAG Run is an object representing an instantiation of the DAG in time. Each DAG may or may not have a schedule, which informs how DAG Runs are created.
