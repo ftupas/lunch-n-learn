@@ -7,6 +7,7 @@ https://airflow.apache.org/docs/apache-airflow/stable/start/docker.html#initiali
 
 1. Run the following command to setup a user
     ```
+    echo -e "AIRFLOW_UID=$(id -u)\nAIRFLOW_GID=0" > .env
     docker-compose up airflow-init
     ```
 2. After the user has been created, we can now launch the other Airflow components
@@ -57,3 +58,4 @@ A DAG Run is an object representing an instantiation of the DAG in time. Each DA
 <hr>
 
 To learn more about the architecture, here's the [documentation](https://airflow.apache.org/docs/apache-airflow/stable/concepts/overview.html).
+To learn more about the arcitecture, here's the [documentation](https://airflow.apache.org/docs/apache-airflow/stable/concepts/overview.html).
