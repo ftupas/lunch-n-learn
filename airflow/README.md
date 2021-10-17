@@ -1,80 +1,46 @@
-# Module 2 - Creating DAGs
+# Module 4 - XCOMs
 
-## Instantiating a DAG object
-A DAG is a Directed Acyclic Graph, meaning it's a graph with nodes, directed edges and no cycles.
+## Cross-Communications (XCOMs)
+- A mechanism that let **Tasks** talk to each other
+- Identified by a `key`, `task_id`, and `dag_id` it came from
+- Explicitly *pushed* and *pulled* using the **Task Instance** methods `xcom_pull` and `do_xcom_push`
 
-![dag](./images/dag.png)
-![not_dag](./images/not_dag.png)
+## XCOM Example
+This DAG contains five tasks, two of which are dummy operators to indicate the start and end of the DAG and three functions which do the following:
 
-To instantiate a DAG object
-- DAG [class](https://airflow.apache.org/docs/apache-airflow/stable/_api/airflow/models/dag/index.html)
+![xcom_dag](./images/xcom_dag.png)
 
-    ```
-    with DAG('dag', default_args=default_args, schedule_interval=None, start_date=days_ago(1), tags=['example'])
-    ```
-- [TaskFlow](https://airflow.apache.org/docs/apache-airflow/stable/concepts/taskflow.html) API
+1. Generate a random n-letter word, in this case it will be 10 letters.
+2. From that random word, the vowels will be removed.
+3. Lastly, the length of the final word will be printed.
 
+## XCOM Push
+By default, the method `do_xcom_push` is enabled. The resuling XCOM will have a key called `return_value`. We can do a custom key by manually calling the `xcom_push` method. In our example, we will be using `random_word` as the key.
 
-    ```
-    @dag(default_args=def   ault_args, schedule_interval=None, start_date=days_ago(1), tags=['example'])
-    ```
+```
+ti.xcom_push(key='random_word', value=random_word)
+```
 
-## Tasks
-These are the most basic units of execution in Airflow. They are arranged into a DAG while creating upstream and downstream dependencies.
+![xcom_push](./images/xcom_push.png)
 
-1. Operators - predefined task templates that you can string together quickly to build most parts of your DAGs 
-    ```
-    ping = SimpleHttpOperator(endpoint="http://example.com/update/")
-    ```
-2. Sensors - a special subclass of Operators which are entirely about waiting for an external event to happen
-3. A TaskFlow-decorated `@task`, which is a custom Python function packaged up as a Task.
-    ```
-    @task
-    def hello_name(name: str):
-        print(f'Hello {name}!')
-    ```
-## Triggering a DAG
-After setting up the `start_date`, tasks, and their dependencies, the DAG can be triggered from the Airflow webserver UI.
+## XCOM Pull
+To pull the XCOM from the previous task, we will be calling the `xcom_pull`s method. Since the task we'll be pulling the XCOM from is in the same DAG, we'll only be needing the `key` and `task_id`. The vowels are then removed from the pulled word.
 
-- First, we need to enable the DAG
+```
+word = ti.xcom_pull(key='random_word', task_ids='create_random_word')
+```
 
-    ![enable_dag](./images/enable_dag.png)
+![xcom_pull](./images/xcom_pull.png)
 
-- If the DAG has a schedule interval and the current date has passed the first `execution_date` (`start_date` + `schedule_interval`), the DAG will run automatically after unpausing it.
+Repeating the same process of pushing and pulling XCOMs, we arrive with the final result of printing out the length of the random word without the vowels.
 
-    ![trigger_dag](./images/trigger_dag.png)
+![length](./images/length.png)
 
-- When `catchup=True`, Airflow will run **all** historical runs until the previous `execution_date`. 
+## XCOM Backend
+By default, XCOMs are stored in the metadata database. There are different limits for each kind of database.
 
-## Airflow UI
+- MySQL: 64 Kb
+- Postgres: 1 Gb
+- SQLite: 2 Gb
 
-1. [DAGs](http://localhost:8080/home) - this is where you can see all the DAGs you have access to both paused and unpaused ones. It's where you can see the total number of DAG runs (success, fail, running), the `schedule_interval`, and certain actions such as triggering the DAG, navigation, and documentation of the code.
-
-2. Once you navigate throw a DAG, you'll see a couple of views and visuals.
-    
-    - [Tree View](http://localhost:8080/tree?dag_id=module-2-hello-world) - shows the historical DAG runs and the status of each task.
-
-        ![tree_view](./images/tree_view.png) 
-    
-    - [Graph View](http://localhost:8080/graph?dag_id=module-2-hello-world) - shows you the DAG structure and the task dependencies. This also shows the status of the latest DAG run.
-
-        ![graph_view](./images/graph_view.png) 
-
-    - [Calendar View](http://localhost:8080/calendar?dag_id=module-2-hello-world) - shows you the heatmap of the DAG runs on the calendar.
-
-        ![graph_view](./images/calendar_view.png)
-
-    - [Gantt](http://localhost:8080/gantt?dag_id=module-2-hello-world) - this is the Gantt chart of the execution times of the tasks. This is useful in identifying bottlenecks in your DAGs so you can optimize it.
-
-        ![Gant](./images/gantt.png)
-
-    - [Code](http://localhost:8080/code?dag_id=module-2-hello-world) - shows you the Python code that generated the DAG.
-
-        ![Gant](./images/code.png)
-
-3. Access and Config - on the top right of the UI, you can navigate to different pages such as access, config, and Airflow documentation.
-
-    ![misc](./images/misc.png)
-
-    - Security - any access and permission related configuration can be viewed and edited here
-    - Admin - this is where you will setup variables and connections that Airflow will use for your DAGs. You can also see the different plugins, pools, and xcom (cross-communication) values here.
+This means that it's not ideal to pass large datasets between tasks. With [Custom XCom Backends](https://www.astronomer.io/guides/custom-xcom-backends), you can push and pull XComs to and from external systems such as S3, GCS, or HDFS rather than the default metadata database, however this doesn't mean you should process this data in Airflow as it's more of an orchestrator than a data processing framework.
