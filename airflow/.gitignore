@@ -1,6 +1,6 @@
 # Airflow and Python
 logs
-.env
+# .env
 __pycache__
 postgres-data/
 covid.csv
