@@ -1,6 +1,5 @@
 # Airflow and Python
 logs
-.env
 __pycache__
 data/
 postgres-data/
