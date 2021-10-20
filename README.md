@@ -14,7 +14,8 @@ https://airflow.apache.org/docs/apache-airflow/stable/start/docker.html#initiali
     docker-compose up -d
     ```
 3. You should be seeing healthy containers running when doing `docker ps -a`
-    ![airflow_containers](./images/airflow_containers.png)
+
+![airflow_containers](./airflow/images/airflow_containers.png)
 
 
 
